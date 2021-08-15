@@ -25,7 +25,7 @@ def olx_spider(db, brand=""):
     total = int(total.split()[4].replace(".", ""))
     pages = ceil(total / 50)
     if pages > 100:
-        log.warn(f"{brand.upper()} ({total}) - Pages: {pages}")
+        log.debug(f"{brand.upper()} ({total}) - Pages: {pages}")
 
     new_posters = 0
     no_features = 0

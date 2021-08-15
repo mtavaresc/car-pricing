@@ -24,6 +24,8 @@ def olx_spider(db, brand=""):
     total = soup.find("span", class_="sc-1mi5vq6-0 eDXljX sc-ifAKCX fhJlIo").text
     total = int(total.split()[4].replace(".", ""))
     pages = ceil(total / 50)
+    if pages > 100:
+        log.warn(f"{brand.upper()} ({total}) - Pages: {pages}")
 
     new_posters = 0
     no_features = 0
@@ -131,5 +133,5 @@ def olx_spider(db, brand=""):
                 )
                 poster_table.insert(poster.__dict__)
                 new_posters += 1
-    print(f"{brand.upper()} ({total}) > News: {new_posters}; NoFeatures: {no_features}; NoPrice: {no_price}\n")
+    print(f"> News: {new_posters}; NoFeatures: {no_features}; NoPrice: {no_price}\n")
     log.info(f"{brand.upper()} ({total}) > News: {new_posters}; NoFeatures: {no_features}; NoPrice: {no_price}")

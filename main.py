@@ -9,7 +9,37 @@ if __name__ == "__main__":
     begin = datetime.now().replace(microsecond=0)
 
     _db = Flata("db/t1.json", storage=JSONStorage)
-    olx_spider(_db)
+    brands = [
+        "AUDI",
+        "BMW",
+        "CHERY",
+        "CITROEN",
+        "DODGE",
+        "FIAT",
+        "FORD",
+        "GM - CHEVROLET",
+        "GURGEL",
+        "HONDA",
+        "HYUNDAI",
+        "JAC",
+        "JEEP",
+        "KIA MOTORS",
+        "LAND ROVER",
+        "MAZDA",
+        "MERCEDES-BENZ",
+        "MITSUBISHI",
+        "NISSAN",
+        "PEUGEOT",
+        "PORSCHE",
+        "RENAULT",
+        "SUZUKI",
+        "TOYOTA",
+        "TROLLER",
+        "VOLVO",
+        "VW - VOLKSWAGEN",
+    ]
+    for brand in brands:
+        olx_spider(_db, brand=brand.replace(" ", "").lower())
 
     end = datetime.now().replace(microsecond=0)
     print(f"\n\n**********")

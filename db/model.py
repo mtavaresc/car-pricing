@@ -3,15 +3,11 @@ class Car(object):
             self,
             brand,
             model,
-            mileage,
-            category,
-            year,
+            category
     ):
         self.brand = brand
         self.model = model
-        self.mileage = mileage
         self.category = category
-        self.year = year
 
 
 class Poster(object):
@@ -19,6 +15,8 @@ class Poster(object):
             self,
             poster_id,
             car_id,
+            car_mileage,
+            car_year,
             title,
             price,
             publish_date,
@@ -28,6 +26,8 @@ class Poster(object):
     ):
         self.poster_id = poster_id
         self.car_id = car_id
+        self.car_mileage = car_mileage
+        self.car_year = car_year
         self.title = title
         self.price = price
         self.publish_date = publish_date

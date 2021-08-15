@@ -1,27 +1,23 @@
-from math import ceil
 from datetime import datetime
+from math import ceil
+
 import requests
 from bs4 import BeautifulSoup
 from flata import Query
 from tqdm import tqdm
+from twiggy import log
 
 from db.model import Car
 from db.model import Poster
-
-"""
-with open('t1.json') as f:
-    data = json.load(f)
-df = pd.json_normalize(data, 'car')
-"""
 
 
 def olx_spider(db, brand=""):
     url = f"https://ce.olx.com.br/autos-e-pecas/carros-vans-e-utilitarios/{brand}"
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-        "AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/80.0.3987.122 "
-        "Safari/537.36"
+                      "AppleWebKit/537.36 (KHTML, like Gecko) "
+                      "Chrome/80.0.3987.122 "
+                      "Safari/537.36"
     }
     results = requests.get(url, headers=headers)
     soup = BeautifulSoup(results.text, "html.parser")
@@ -29,8 +25,10 @@ def olx_spider(db, brand=""):
     total = int(total.split()[4].replace(".", ""))
     pages = ceil(total / 50)
 
-    # print(f"Total posters: {total}, Total pages: {pages}")
-    for page in tqdm(range(1, pages + 1), desc=brand.upper()):
+    new_posters = 0
+    no_features = 0
+    no_price = 0
+    for page in tqdm(range(1, pages + 1), desc=f"{brand.upper()} ({total})"):
         res = requests.get(f"{url}&o={page}", headers=headers)
         s = BeautifulSoup(res.text, "html.parser")
 
@@ -52,13 +50,15 @@ def olx_spider(db, brand=""):
                 poster = BeautifulSoup(req.text, "html.parser")
 
                 try:
-                    car_features = (
-                        poster.find_all("div", class_="sc-bwzfXH h3us20-0 cBfPri")[1]
-                        .find("div", class_="duvuxf-0 h3us20-0 jAHFXn")
-                        .find("div", class_="h3us20-6 eaygqA")
-                        .find_all("div", class_="sc-hmzhuo HlNae sc-jTzLTM iwtnNi")
-                    )
+                    c0 = "sc-bwzfXH h3us20-0 cBfPri"
+                    c1 = "duvuxf-0 h3us20-0 jAHFXn"
+                    c2 = "h3us20-6 eaygqA"
+                    c3 = "sc-hmzhuo HlNae sc-jTzLTM iwtnNi"
+                    car_features = poster.find_all("div", class_=c0)[1].find("div", class_=c1).find("div",
+                                                                                                    class_=c2).find_all(
+                        "div", class_=c3)
                 except (AttributeError, IndexError):
+                    no_features += 1
                     continue
                 try:
                     car_model = car_features[1].find("a").text
@@ -101,6 +101,7 @@ def olx_spider(db, brand=""):
                 try:
                     price = poster.find("h2", class_="sc-ifAKCX eQLrcK").text
                 except AttributeError:
+                    no_price += 1
                     continue
                 poster_price = int(price.split(" ")[1].replace(".", ""))
                 poster_info = poster.find(
@@ -113,13 +114,8 @@ def olx_spider(db, brand=""):
                 publish_date = datetime.strptime(publish_date, "%d/%m %H:%M")
                 poster_publish_date = publish_date.replace(year=2021)
                 poster_professional = True if len(poster_info) > 3 else False
-                poster_location = (
-                    poster.find_all(
-                        "div", class_="sc-hmzhuo sc-1f2ug0x-3 ONRJp sc-jTzLTM iwtnNi"
-                    )[1]
-                    .find("dd")
-                    .text
-                )
+                class_location = "sc-hmzhuo sc-1f2ug0x-3 ONRJp sc-jTzLTM iwtnNi"
+                poster_location = poster.find_all("div", class_=class_location)[1].find("dd").text
 
                 poster = Poster(
                     poster_id=poster_id,
@@ -134,3 +130,6 @@ def olx_spider(db, brand=""):
                     link=poster_link,
                 )
                 poster_table.insert(poster.__dict__)
+                new_posters += 1
+    print(f"{brand.upper()} ({total}) > News: {new_posters}; NoFeatures: {no_features}; NoPrice: {no_price}\n")
+    log.info(f"{brand.upper()} ({total}) > News: {new_posters}; NoFeatures: {no_features}; NoPrice: {no_price}")

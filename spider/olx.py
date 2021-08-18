@@ -71,11 +71,11 @@ def olx_spider(db, brand=""):
                 except (AttributeError, IndexError):
                     car_brand = None
                 try:
-                    car_category = (
+                    car_body = (
                         car_features[3].find("span", class_="sc-ifAKCX cmFKIN").text
                     )
                 except (AttributeError, IndexError):
-                    car_category = None
+                    car_body = None
                 try:
                     poster_car_year = car_features[4].find("a").text
                 except (AttributeError, IndexError):
@@ -90,7 +90,7 @@ def olx_spider(db, brand=""):
                 car = Car(
                     brand=car_brand,
                     model=car_model,
-                    category=car_category,
+                    car_body=car_body,
                 )
                 car_table = db.table("car")
                 search_car = db.get("car").search(Query().model == car.model)
@@ -135,3 +135,4 @@ def olx_spider(db, brand=""):
                 new_posters += 1
     print(f"> News: {new_posters}; NoFeatures: {no_features}; NoPrice: {no_price}\n")
     log.info(f"{brand.upper()} ({total}) > News: {new_posters}; NoFeatures: {no_features}; NoPrice: {no_price}")
+    return new_posters

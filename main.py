@@ -32,11 +32,14 @@ if __name__ == "__main__":
     brands = search_brands('brands.txt')
     b = 1
     t = len(brands)
+    news = 0
+
     for brand in brands:
         print(f"{b}/{t}")
-        olx_spider(_db, brand=brand.replace(" ", "").lower())
+        news += olx_spider(_db, brand=brand.replace(" ", "").lower())
         b += 1
 
+    print(f"> Total New Posters: {news}")
     json_normalize_to_df()
     end = datetime.now().replace(microsecond=0)
     print(f"\n\n**********")

@@ -3,11 +3,19 @@ class Car(object):
             self,
             brand,
             model,
-            category
+            car_body,
+            fuel_type=None,
+            aspiration=None,
+            door_number=None,
+            drive_wheel=None
     ):
         self.brand = brand
         self.model = model
-        self.category = category
+        self.car_body = car_body
+        self.fuel_type = fuel_type
+        self.aspiration = aspiration
+        self.door_number = door_number
+        self.drive_wheel = drive_wheel
 
 
 class Poster(object):
